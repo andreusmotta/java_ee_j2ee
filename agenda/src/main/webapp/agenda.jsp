@@ -3,6 +3,9 @@
 <%@ page import="model.JavaBeans"%>
 <%@ page import="java.util.ArrayList"%>
 <%
+	// Para tirar o "aviso" (sublinhado amarelo) da linha do array:
+	@ SuppressWarnings ("unchecked")
+	
 	ArrayList<JavaBeans> lista = (ArrayList<JavaBeans>) request.getAttribute("contatos");
 
 	// Teste de listagem de dados:
@@ -24,6 +27,7 @@
 <body>
 	<h1>Agenda de contatos</h1>
 	<a href="novo.html" class="Botao1">Novo Contato</a>
+	<a href="report" class="Botao2">Relatório</a>
 	
 	<table id="tabela">
 		<thead>

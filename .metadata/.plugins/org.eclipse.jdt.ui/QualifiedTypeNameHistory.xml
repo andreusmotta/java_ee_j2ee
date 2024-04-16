@@ -4,4 +4,6 @@
     <fullyQualifiedTypeName name="java.sql.DriverManager"/>
     <fullyQualifiedTypeName name="model.DAO"/>
     <fullyQualifiedTypeName name="model.JavaBeans"/>
+    <fullyQualifiedTypeName name="com.itextpdf.text.Document"/>
+    <fullyQualifiedTypeName name="com.itextpdf.text.pdf.PdfWriter"/>
 </qualifiedTypeNameHistroy>

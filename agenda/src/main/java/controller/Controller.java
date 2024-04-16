@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,23 +11,49 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 // Importei a classe DAO:
 import model.DAO;
 // importei a classe JavaBeans:
 import model.JavaBeans;
 
-@WebServlet(urlPatterns = { "/Controller", "/main", "/insert", "/select", "/update", "/delete" })
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Controller.
+ */
+@WebServlet(urlPatterns = { "/Controller", "/main", "/insert", "/select", "/update", "/delete", "/report" })
 public class Controller extends HttpServlet {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The dao. */
 	// Criando o objeto DAO:
 	DAO dao = new DAO();
+	
+	/** The contato. */
 	JavaBeans contato = new JavaBeans();
 
+	/**
+	 * Instantiates a new controller.
+	 */
 	public Controller() {
 		super();
 	}
 
+	/**
+	 * Do get.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -37,22 +64,35 @@ public class Controller extends HttpServlet {
 
 		// Direcionando pro main:
 		String action = request.getServletPath();
-		System.out.println(action);
+		
+		//Teste de recebimento de requisições:
+//		System.out.println(action);
+		
 		if (action.equals("/main")) {
 			contatos(request, response);
 		} else if (action.equals("/insert")) {
-			novoContato(request, response);
+			adicionarContato(request, response);
 		} else if (action.equals("/select")) {
 			listarContato(request, response);
 		} else if (action.equals("/update")) {
 			editarContato(request, response);
 		} else if (action.equals("/delete")) {
 			removerContato(request, response);
+		} else if (action.equals("/report")) {
+			gerarRelatorio(request, response);
 		} else {
 			response.sendRedirect("index.html");
 		}
 	}
 
+	/**
+	 * Contatos.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	// Listar contatos:
 	protected void contatos(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -78,8 +118,16 @@ public class Controller extends HttpServlet {
 
 	}
 
-	// Novo contato:
-	protected void novoContato(HttpServletRequest request, HttpServletResponse response)
+	/**
+	 * Adicionar contato.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	// Adicionar contato:
+	protected void adicionarContato(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Teste de recebimento dos dados do formulario:
 //		System.out.println(request.getParameter("nome"));
@@ -98,12 +146,20 @@ public class Controller extends HttpServlet {
 
 	}
 
+	/**
+	 * Listar contato.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	// Editar contato
 	protected void listarContato(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Recebimento do id do contato que será editado:
 		String idcon = request.getParameter("idcon");
-		// Testte para ver se está pegando o idcon corretamente (aparece no console):
+		// Teste para ver se está pegando o idcon corretamente (aparece no console):
 //		System.out.println(idcon);
 		// Setar variável JavaBeans:
 		contato.setIdcon(idcon);
@@ -126,12 +182,28 @@ public class Controller extends HttpServlet {
 
 	}
 
+	/**
+	 * Do post.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		doGet(request, response);
 	}
 
+	/**
+	 * Editar contato.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void editarContato(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Setar as variáveis JavaBeans:
@@ -151,6 +223,14 @@ public class Controller extends HttpServlet {
 //		System.out.println(request.getParameter("email"));
 	}
 
+	/**
+	 * Remover contato.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	// Remover um contato:
 	protected void removerContato(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -167,4 +247,51 @@ public class Controller extends HttpServlet {
 
 	}
 
+	/**
+	 * Gerar relatorio.
+	 *
+	 * @param request the request
+	 * @param response the response
+	 * @throws ServletException the servlet exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	// Gerar relatório em PDF:
+	protected void gerarRelatorio(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		Document documento = new Document();
+		try {
+			// Tipo de conteúdo:
+			response.setContentType("apllication/pdf");
+			// Nome do documento:
+			response.addHeader("Content-Disposition", "inline; filename=" + "contatos.pdf");
+			// Criar o documento:
+			PdfWriter.getInstance(documento, response.getOutputStream());
+			// Abrir o documento para gerar o conteúdo:
+			documento.open();
+			documento.add(new Paragraph("Lista de contatos:"));
+			documento.add(new Paragraph(" "));
+			// Criar uma tabela:
+			PdfPTable tabela = new PdfPTable(3);
+			PdfPCell col1 = new PdfPCell(new Paragraph("Nome"));
+			PdfPCell col2 = new PdfPCell(new Paragraph("Fone"));
+			PdfPCell col3 = new PdfPCell(new Paragraph("E-Mail"));
+			tabela.addCell(col1);
+			tabela.addCell(col2);
+			tabela.addCell(col3);
+			// Popular a tabela com os contatos:
+			ArrayList<JavaBeans> lista = dao.listarContatos();
+			for (int i = 0; i < lista.size(); i++) {
+				tabela.addCell(lista.get(i).getNome());
+				tabela.addCell(lista.get(i).getFone());
+				tabela.addCell(lista.get(i).getEmail());
+			}
+			
+			documento.add(tabela);			
+			documento.close();			
+		} catch (Exception e) {
+			System.out.println(e);
+			documento.close();
+		}
+	}
+	
 }

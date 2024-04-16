@@ -1,5 +1,6 @@
 /**
  * Confirmação de exlcusão de contatos no site/banco
+ * @param idcon
  */
 
  function confirmar(idcon) {
